@@ -8,7 +8,6 @@
 DHT mojeDHT(DHT_PIN, DHT22_TYPE);
 
 
-
 void setup() {
  // Nastaveni logovani
   Serial.begin(9600);
