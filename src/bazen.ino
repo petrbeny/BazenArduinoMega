@@ -4,6 +4,7 @@
 
 #define DHT_PIN 2
 #define DLS_PIN 3
+#define RELE_PIN 4
 #define PH_PIN A0
 
 #define DHT22_TYPE DHT22
@@ -24,6 +25,10 @@ void setup()
   mojeDHT.begin();
   // zapnutí komunikace knihovny s teplotním čidlem
   senzoryDS.begin();
+  // --- Nastaveni relatka -----------------------------------------
+  pinMode(RELE_PIN, OUTPUT);
+  // Default je uzemnene/zaple na LOW, takze vypnout
+  digitalWrite(RELE_PIN, HIGH);
 }
 
 void loop()
@@ -91,10 +96,25 @@ void loop()
   float vyslednePH = -5.70 * prumerPH + 21.34;
   // vytištění výsledků po sériové lince
   // Print("PH bazenu", vyslednePH, "pH");
-  Serial.print("Namerene pH: ");
+  Serial.print("Bazen pH: ");
   Serial.println(vyslednePH);
 
-  delay(900);
+  // Sepnout rele
+  closeRelay();
+
+  delay(10000);
+}
+
+void closeRelay()
+{
+  Serial.println("close relay");
+  // sepne rele
+  digitalWrite(RELE_PIN, LOW);
+  delay(2000);
+  Serial.println("open relay");
+  digitalWrite(RELE_PIN, HIGH);
+  //Serial.println(client.connected());
+  //client.publish("/outside/gate/lock", "0");
 }
 
 void Print(String source, int value, String unit)
