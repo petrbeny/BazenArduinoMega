@@ -6,6 +6,7 @@
 #define DLS_PIN 3
 #define RELE_FILTRACE_PIN 4
 #define RELE_CERPADLO_PIN 5
+#define PIR_PIN 6
 #define PH_PIN A0
 
 #define DHT22_TYPE DHT22
@@ -31,6 +32,12 @@ void setup()
   pinMode(RELE_FILTRACE_PIN, OUTPUT);
   // Cerpadlo
   pinMode(RELE_CERPADLO_PIN, OUTPUT);
+
+  // PIR
+  pinMode(PIR_PIN, INPUT);
+  // nastavení přerušení na pin 6 (int0) 
+  // při rostoucí hraně (logO->log1) se vykoná program prerus 
+  attachInterrupt(0, detection, RISING);
 }
 
 void loop()
@@ -131,4 +138,10 @@ void closeRelay(int relePin)
   digitalWrite(relePin, LOW);
   // Serial.println(client.connected());
   // client.publish("/outside/gate/lock", "0");
+}
+
+void detection() {
+  // pokud je aktivován digitální vstup,
+  // vypiš informaci po sériové lince
+  Serial.println("Detekce pohybu pomoci HC-SR501!");
 }
