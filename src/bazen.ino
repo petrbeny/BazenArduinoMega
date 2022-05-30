@@ -4,7 +4,8 @@
 
 #define DHT_PIN 2
 #define DLS_PIN 3
-#define RELE_PIN 4
+#define RELE_FILTRACE_PIN 4
+#define RELE_CERPADLO_PIN 5
 #define PH_PIN A0
 
 #define DHT22_TYPE DHT22
@@ -25,10 +26,11 @@ void setup()
   mojeDHT.begin();
   // zapnutí komunikace knihovny s teplotním čidlem
   senzoryDS.begin();
-  // --- Nastaveni relatka -----------------------------------------
-  pinMode(RELE_PIN, OUTPUT);
-  // Default je uzemnene/zaple na LOW, takze vypnout
-  digitalWrite(RELE_PIN, HIGH);
+  // --- Nastaveni relatek -------------------------------------------------------------------------------------
+  // Filtrace
+  pinMode(RELE_FILTRACE_PIN, OUTPUT);
+  // Cerpadlo
+  pinMode(RELE_CERPADLO_PIN, OUTPUT);  
 }
 
 void loop()
@@ -99,20 +101,24 @@ void loop()
   Serial.print("Bazen pH: ");
   Serial.println(vyslednePH);
 
-  // Sepnout rele
-  closeRelay();
+  //--- Sepnout rele ---------------------------------------------------
+  // Sepne filtraci
+  closeRelay(RELE_FILTRACE_PIN);
+  // Sepne cerpadlo
+  closeRelay(RELE_CERPADLO_PIN);
 
   delay(10000);
 }
 
-void closeRelay()
+// 
+void closeRelay(int relePin)
 {
   Serial.println("close relay");
   // sepne rele
-  digitalWrite(RELE_PIN, LOW);
+  digitalWrite(relePin, HIGH);
   delay(2000);
   Serial.println("open relay");
-  digitalWrite(RELE_PIN, HIGH);
+  digitalWrite(relePin, LOW);
   //Serial.println(client.connected());
   //client.publish("/outside/gate/lock", "0");
 }
