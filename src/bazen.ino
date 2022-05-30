@@ -30,7 +30,7 @@ void setup()
   // Filtrace
   pinMode(RELE_FILTRACE_PIN, OUTPUT);
   // Cerpadlo
-  pinMode(RELE_CERPADLO_PIN, OUTPUT);  
+  pinMode(RELE_CERPADLO_PIN, OUTPUT);
 }
 
 void loop()
@@ -97,9 +97,7 @@ void loop()
   float prumerPH = (float)prumerVysl * 5.0 / 1024 / 6;
   float vyslednePH = -5.70 * prumerPH + 21.34;
   // vytištění výsledků po sériové lince
-  // Print("PH bazenu", vyslednePH, "pH");
-  Serial.print("Bazen pH: ");
-  Serial.println(vyslednePH);
+  Print("PH bazenu", vyslednePH, "pH");  
 
   //--- Sepnout rele ---------------------------------------------------
   // Sepne filtraci
@@ -110,7 +108,7 @@ void loop()
   delay(10000);
 }
 
-// 
+//
 void closeRelay(int relePin)
 {
   Serial.println("close relay");
@@ -119,13 +117,13 @@ void closeRelay(int relePin)
   delay(2000);
   Serial.println("open relay");
   digitalWrite(relePin, LOW);
-  //Serial.println(client.connected());
-  //client.publish("/outside/gate/lock", "0");
+  // Serial.println(client.connected());
+  // client.publish("/outside/gate/lock", "0");
 }
 
-void Print(String source, int value, String unit)
+void Print(String source, float value, String unit)
 {
   Serial.print(source + ": ");
-  Serial.print(value, DEC);
+  Serial.print(value, 2);
   Serial.println(unit);
 }
