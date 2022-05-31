@@ -2,11 +2,11 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-#define DHT_PIN 2
+#define DHT_PIN 6
 #define DLS_PIN 3
 #define RELE_FILTRACE_PIN 4
 #define RELE_CERPADLO_PIN 5
-#define PIR_PIN 6
+#define PIR_PIN 2 // PIR je na 2 pinu kvuli podpore ineruptu
 #define PH_PIN A0
 
 #define DHT22_TYPE DHT22
@@ -37,7 +37,7 @@ void setup()
   pinMode(PIR_PIN, INPUT);
   // nastavení přerušení na pin 6 (int0) 
   // při rostoucí hraně (logO->log1) se vykoná program prerus 
-  attachInterrupt(0, detection, RISING);
+  attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);  
 }
 
 void loop()
