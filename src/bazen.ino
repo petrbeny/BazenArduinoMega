@@ -35,39 +35,20 @@ void setup()
 
   // PIR
   pinMode(PIR_PIN, INPUT);
-  // nastavení přerušení na pin 6 (int0) 
-  // při rostoucí hraně (logO->log1) se vykoná program prerus 
-  attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);  
+  // nastavení přerušení na pin 6 (int0)
+  // při rostoucí hraně (logO->log1) se vykoná program prerus
+  attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
 }
 
 void loop()
 {
-  // --- DHT senzor -------------------------------------------------------------------------------------------
-  // nacteni teploty a vlhkosti s DHT senzoru
-  float tep = mojeDHT.readTemperature();
-  float vlh = mojeDHT.readHumidity();
-  // kontrola, jestli jsou načtené hodnoty čísla pomocí funkce isnan
-  if (isnan(tep) || isnan(vlh))
-  {
-    // při chybném čtení vypiš hlášku
-    Serial.println("Chyba při čtení z DHT senzoru!");
-  }
-  else
-  {
-    // pokud jsou hodnoty v pořádku,
-    // vypiš je po sériové lince
-    Print("Venkovni teplota", tep, "°C");
-    Print("Venkovni vlhkost", vlh, "%");
-    // client.publish("/house/downstairs/komora/thermometer/temperature", String(tep, 3).c_str());
-    // client.publish("/house/downstairs/komora/thermometer/humidity", String(vlh, 3).c_str());
-  }
+  // --- Venkovni teplota a vlhkost ---
+  ReadDht();
 
-  // --- Dallas senzor -----------------------------------------------------------------------------------------
-  // načtení informací ze všech připojených čidel na daném pinu
-  senzoryDS.requestTemperatures();
-  Print("Teplota bazenu", senzoryDS.getTempCByIndex(0), "°C");
+  // --- Teplota bazenu ---------------
+  ReadDallas();
 
-  // --- pH bazenu ---------------------------------------------------------------------------------------------
+  // --- pH bazenu --------------------
   ReadPh();
 
   //--- Sepnout rele ---------------------------------------------------
@@ -86,9 +67,37 @@ void Print(String source, float value, String unit)
   Serial.println(unit);
 }
 
+void ReadDht()
+{
+  // nacteni teploty a vlhkosti s DHT senzoru
+  float tep = mojeDHT.readTemperature();
+  float vlh = mojeDHT.readHumidity();
+  // kontrola, jestli jsou načtené hodnoty čísla pomocí funkce isnan
+  if (isnan(tep) || isnan(vlh))
+  {
+    // při chybném čtení vypiš hlášku
+    Serial.println("Chyba při čtení z DHT senzoru!");
+  }
+  else
+  {
+    // pokud jsou hodnoty v pořádku,
+    // vypiš je po sériové lince
+    Print("Venkovni teplota", tep, "°C");
+    Print("Venkovni vlhkost", vlh, "%");
+    // client.publish("/house/downstairs/komora/thermometer/temperature", String(tep, 3).c_str());
+    // client.publish("/house/downstairs/komora/thermometer/humidity", String(vlh, 3).c_str());
+  }
+}
+
+void ReadDallas()
+{
+  // načtení informací ze všech připojených čidel na daném pinu
+  senzoryDS.requestTemperatures();
+  Print("Teplota bazenu", senzoryDS.getTempCByIndex(0), "°C");
+}
+
 void ReadPh()
 {
-  // --- PH senzor ---------------------------------------------------------------------------------------------
   // vytvoření pomocných proměnných
   int pole[10];
   int zaloha;
@@ -140,7 +149,8 @@ void closeRelay(int relePin)
   // client.publish("/outside/gate/lock", "0");
 }
 
-void detection() {
+void detection()
+{
   // pokud je aktivován digitální vstup,
   // vypiš informaci po sériové lince
   Serial.println("Detekce pohybu pomoci HC-SR501!");
