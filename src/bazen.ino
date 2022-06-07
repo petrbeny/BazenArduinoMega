@@ -1,6 +1,7 @@
 #include <DHT.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <Ethernet.h>
 
 #define DHT_PIN 6
 #define DLS_PIN 3
@@ -8,6 +9,14 @@
 #define RELE_CERPADLO_PIN 5
 #define PIR_PIN 2 // PIR je na 2 pinu kvuli podpore ineruptu
 #define PH_PIN A0
+
+// Arduino MAC address must be unique for every node in same network
+// To make a new unique address change last letter
+// Arduino 0
+byte mac[] = {0xCC, 0xFA, 0x06, 0xCB, 0x19, 0x02};
+
+// Unique static IP address of this Arduino
+IPAddress ip(192, 168, 200, 51);
 
 #define DHT22_TYPE DHT22
 
@@ -23,6 +32,11 @@ void setup()
 {
   // Nastaveni logovani
   Serial.begin(9600);
+  // Setup ethernet connection to MQTT broker
+  Ethernet.begin(mac, ip);
+  // výpis informace o nastavené IP adrese
+  Serial.print("Server je na IP adrese: ");
+  Serial.println(Ethernet.localIP());
   // zapnutí komunikace s teploměrem DHT...
   mojeDHT.begin();
   // zapnutí komunikace knihovny s teplotním čidlem
