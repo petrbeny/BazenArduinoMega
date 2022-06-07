@@ -139,11 +139,11 @@ void ReadPh()
 
 void closeRelay(int relePin)
 {
-  Serial.println("close relay");
+  //Serial.println("close relay");
   // sepne rele
   digitalWrite(relePin, HIGH);
   delay(2000);
-  Serial.println("open relay");
+  //Serial.println("open relay");
   digitalWrite(relePin, LOW);
   // Serial.println(client.connected());
   // client.publish("/outside/gate/lock", "0");
