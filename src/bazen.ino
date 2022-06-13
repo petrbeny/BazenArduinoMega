@@ -8,7 +8,7 @@
 #define RELE_FILTRACE_PIN 4
 #define RELE_CERPADLO_PIN 5
 #define PIR_PIN 2 // PIR je na 2 pinu kvuli podpore ineruptu
-#define PH_PIN A0
+#define PH_PIN A8
 
 // Arduino MAC address must be unique for every node in same network
 // To make a new unique address change last letter
@@ -32,44 +32,51 @@ void setup()
 {
   // Nastaveni logovani
   Serial.begin(9600);
+
   // Setup ethernet connection to MQTT broker
   Ethernet.begin(mac, ip);
+
   // výpis informace o nastavené IP adrese
   Serial.print("Server je na IP adrese: ");
   Serial.println(Ethernet.localIP());
+
   // zapnutí komunikace s teploměrem DHT...
   mojeDHT.begin();
+  
   // zapnutí komunikace knihovny s teplotním čidlem
-  senzoryDS.begin();
-  // --- Nastaveni relatek -------------------------------------------------------------------------------------
+  senzoryDS.begin();  
+  
+  // --- Nastaveni relatek -------------------------------------------------------------------------------------0
   // Filtrace
   pinMode(RELE_FILTRACE_PIN, OUTPUT);
+
   // Cerpadlo
   pinMode(RELE_CERPADLO_PIN, OUTPUT);
 
   // PIR
   pinMode(PIR_PIN, INPUT);
+
   // nastavení přerušení na pin 6 (int0)
   // při rostoucí hraně (logO->log1) se vykoná program prerus
-  attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
+  //attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);  
 }
 
 void loop()
 {
   // --- Venkovni teplota a vlhkost ---
-  ReadDht();
+  //ReadDht();
 
   // --- Teplota bazenu ---------------
-  ReadDallas();
+  //ReadDallas();
 
   // --- pH bazenu --------------------
   ReadPh();
 
   //--- Sepnout rele ---------------------------------------------------
   // Sepne filtraci
-  closeRelay(RELE_FILTRACE_PIN);
+  //closeRelay(RELE_FILTRACE_PIN);
   // Sepne cerpadlo
-  closeRelay(RELE_CERPADLO_PIN);
+  //closeRelay(RELE_CERPADLO_PIN);
 
   delay(10000);
 }
