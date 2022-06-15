@@ -3,10 +3,9 @@
 #include <DallasTemperature.h>
 #include <Ethernet.h>
 
+// piny 4 a 10 nepouzivat, pac je pouziva ethernet schiled kvuli komunikaci s arduino deskou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define DHT_PIN 6
 #define DLS_PIN 3
-#define RELE_FILTRACE_PIN 4
-#define RELE_CERPADLO_PIN 5
 #define PIR_PIN 2 // PIR je na 2 pinu kvuli podpore ineruptu
 #define PH_PIN A8
 
@@ -42,41 +41,34 @@ void setup()
 
   // zapnutí komunikace s teploměrem DHT...
   mojeDHT.begin();
-  
-  // zapnutí komunikace knihovny s teplotním čidlem
-  senzoryDS.begin();  
-  
-  // --- Nastaveni relatek -------------------------------------------------------------------------------------0
-  // Filtrace
-  pinMode(RELE_FILTRACE_PIN, OUTPUT);
 
-  // Cerpadlo
-  pinMode(RELE_CERPADLO_PIN, OUTPUT);
+  // zapnutí komunikace knihovny s teplotním čidlem
+  senzoryDS.begin();
 
   // PIR
   pinMode(PIR_PIN, INPUT);
 
   // nastavení přerušení na pin 6 (int0)
   // při rostoucí hraně (logO->log1) se vykoná program prerus
-  //attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);  
+  // attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
 }
 
 void loop()
 {
   // --- Venkovni teplota a vlhkost ---
-  //ReadDht();
+  // ReadDht();
 
   // --- Teplota bazenu ---------------
-  //ReadDallas();
+  // ReadDallas();
 
   // --- pH bazenu --------------------
   ReadPh();
 
   //--- Sepnout rele ---------------------------------------------------
   // Sepne filtraci
-  //closeRelay(RELE_FILTRACE_PIN);
+  // closeRelay(RELE_FILTRACE_PIN);
   // Sepne cerpadlo
-  //closeRelay(RELE_CERPADLO_PIN);
+  // closeRelay(RELE_CERPADLO_PIN);
 
   delay(10000);
 }
@@ -160,11 +152,11 @@ void ReadPh()
 
 void closeRelay(int relePin)
 {
-  //Serial.println("close relay");
-  // sepne rele
+  // Serial.println("close relay");
+  //  sepne rele
   digitalWrite(relePin, HIGH);
   delay(2000);
-  //Serial.println("open relay");
+  // Serial.println("open relay");
   digitalWrite(relePin, LOW);
   // Serial.println(client.connected());
   // client.publish("/outside/gate/lock", "0");
