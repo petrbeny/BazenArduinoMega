@@ -2,6 +2,7 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 #include <Ethernet.h>
+#include <PubSubClient.h>
 
 // piny 4 a 10 nepouzivat, pac je pouziva ethernet schiled kvuli komunikaci s arduino deskou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #define DHT_PIN 6
@@ -16,6 +17,13 @@ byte mac[] = {0xCC, 0xFA, 0x06, 0xCB, 0x19, 0x02};
 
 // Unique static IP address of this Arduino
 IPAddress ip(192, 168, 200, 51);
+
+// IP Address of your MQTT broker (OpenHAB server)
+byte server[] = {192, 168, 200, 123};
+
+EthernetClient arduinoBazen;
+void callback(char *topic, byte *payload, unsigned int length);
+PubSubClient client(server, 1883, callback, arduinoBazen);
 
 #define DHT22_TYPE DHT22
 
@@ -34,6 +42,18 @@ void setup()
 
   // Setup ethernet connection to MQTT broker
   Ethernet.begin(mac, ip);
+  // change as desired - clientname must be unique for MQTT broker
+  if (client.connect("arduinoBazen", "openhabian", "4Mamf6we"))
+  {
+    client.publish("/outside/arduinoBazen/connect", "hello world - here arduinoBazen ip 192.168.200.51");
+    Serial.println("connected");
+    // subscribe to topics
+    client.subscribe("/house/downstairs/loznice/co2sensor/calibration");
+  }
+  else
+  {
+    Serial.println("MQTT client not connected!");
+  }
 
   // výpis informace o nastavené IP adrese
   Serial.print("Server je na IP adrese: ");
@@ -53,8 +73,50 @@ void setup()
   // attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
 }
 
+long lastReconnectAttempt = 0;
+boolean reconnect()
+{
+  if (client.connect("arduinoMegaOriginal1", "openhabian", "4Mamf6we"))
+  {    
+    // Once connected, publish an announcement...
+    client.publish("/outside/gate/lock", "reconnected");
+    // ... and resubscribe
+    client.subscribe("/outside/gate/lock");
+    client.subscribe("/house/downstairs/loznice/co2sensor/calibration");
+  }
+
+  return client.connected();
+}
+
 void loop()
 {
+  // --- MQTT client handling -------------------------------------------
+  if (!client.connected())
+  {
+    Serial.println("MQTT arduino client disconnected");
+    long now = millis();
+    if (now - lastReconnectAttempt > 5000)
+    {
+      lastReconnectAttempt = now;
+      // Attempt to reconnect
+      if (reconnect())
+      {
+        lastReconnectAttempt = 0;
+        Serial. println("reconnected");
+      }
+      else
+      {
+        Serial.println("reconnection failed");
+      }
+    }
+  }
+  else
+  {
+    Serial.println("MQTT arduino client connected");
+    // Client connected
+    client.loop();
+  }
+
   // --- Venkovni teplota a vlhkost ---
   // ReadDht();
 
@@ -167,4 +229,37 @@ void detection()
   // pokud je aktivován digitální vstup,
   // vypiš informaci po sériové lince
   Serial.println("Detekce pohybu pomoci HC-SR501!");
+}
+
+// Handle and convert incoming MQTT messages ----------------------------------------
+void callback(char *topic, byte *payload, unsigned int length)
+{
+  // Print the topic
+  Serial.print("Topic: ");
+  Serial.println(topic);
+
+  // handle message arrived
+  String content = "";
+  char character;
+  for (int num = 0; num < length; num++)
+  {
+    character = payload[num];
+    content.concat(character);
+  }
+
+  String t = topic;
+
+  Serial.println(t);
+
+  /*
+  if (t == "/outside/gate/lock" && content == "1")
+  {
+    closeRelay();
+  }
+
+  if (t == "/house/downstairs/loznice/co2sensor/calibration" && content == "1")
+  {
+    CalibrateCo2Senzors();
+  }
+  */
 }
