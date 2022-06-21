@@ -70,7 +70,7 @@ void setup()
 
   // nastavení přerušení na pin 6 (int0)
   // při rostoucí hraně (logO->log1) se vykoná program prerus
-  // attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
+   attachInterrupt(digitalPinToInterrupt(PIR_PIN), detection, RISING);
 }
 
 long lastReconnectAttempt = 0;
@@ -112,16 +112,16 @@ void loop()
   }
   else
   {
-    Serial.println("MQTT arduino client connected");
+    //Serial.println("MQTT arduino client connected");
     // Client connected
     client.loop();
   }
 
   // --- Venkovni teplota a vlhkost ---
-  // ReadDht();
+   ReadDht();
 
   // --- Teplota bazenu ---------------
-  // ReadDallas();
+   ReadDallas();
 
   // --- pH bazenu --------------------
   ReadPh();
